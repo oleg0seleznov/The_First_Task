@@ -7,6 +7,7 @@ import by.seleznov.task1.entity.IntArrayEntity;
 import by.seleznov.task1.exception.InvalidArrayException;
 import by.seleznov.task1.factory.ArrayFactory;
 import by.seleznov.task1.factory.IntArrayFactory;
+import by.seleznov.task1.repository.ArrayRepository;
 import by.seleznov.task1.validation.ArrayDataValidator;
 import by.seleznov.task1.validation.IntArrayDataValidator;
 import java.util.List;
@@ -16,6 +17,7 @@ class IntArrayDataParserTest {
 
     private final ArrayDataValidator validator = new IntArrayDataValidator();
     private final ArrayFactory factory = new IntArrayFactory();
+    private final ArrayRepository repository = ArrayRepository.getInstance();
     private final ArrayDataParser parser = new IntArrayDataParser(validator, factory);
 
     @Test
@@ -30,5 +32,7 @@ class IntArrayDataParserTest {
         assertEquals(2, arrays.size());
         assertArrayEquals(new int[] {1, 2, 3}, arrays.get(0).getValues());
         assertArrayEquals(new int[] {4, 5, 6}, arrays.get(1).getValues());
+        repository.removeById(arrays.get(0).getId());
+        repository.removeById(arrays.get(1).getId());
     }
 }

@@ -1,8 +1,11 @@
 package by.seleznov.task1.parser;
 
 import by.seleznov.task1.entity.IntArrayEntity;
+import by.seleznov.task1.exception.ArrayParserException;
 import by.seleznov.task1.exception.InvalidArrayException;
 import by.seleznov.task1.factory.ArrayFactory;
+import by.seleznov.task1.repository.ArrayRepository;
+import by.seleznov.task1.repository.ArrayRepositoryService;
 import by.seleznov.task1.validation.ArrayDataValidator;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +20,22 @@ public class IntArrayDataParser implements ArrayDataParser {
 
     private final ArrayDataValidator validator;
     private final ArrayFactory factory;
+    private final ArrayRepositoryService repository;
 
     public IntArrayDataParser(ArrayDataValidator validator, ArrayFactory factory) {
+        this(validator, factory, ArrayRepository.getInstance());
+    }
+
+    public IntArrayDataParser(
+            ArrayDataValidator validator,
+            ArrayFactory factory,
+            ArrayRepositoryService repository) {
+        if (validator == null || factory == null || repository == null) {
+            throw new ArrayParserException("Parser dependencies must not be null.");
+        }
         this.validator = validator;
         this.factory = factory;
+        this.repository = repository;
     }
 
     @Override
@@ -36,7 +51,9 @@ public class IntArrayDataParser implements ArrayDataParser {
             }
             if (validator.isValid(line)) {
                 int[] values = parseValues(line);
-                arrays.add(factory.create(values));
+                IntArrayEntity array = factory.create(values);
+                repository.add(array);
+                arrays.add(array);
             } else {
                 LOGGER.warn("Skipping invalid array data at line {}.", lineIndex + 1);
             }
